@@ -1,0 +1,108 @@
+✅ STEP 1: Create the topology
+
+Take these devices:
+
+2 × Routers (4331)
+
+2 × Switches (2960)
+
+2 × PCs
+
+Connections:
+
+PC0 → Switch0 → Router0 (Gig0/0)
+
+PC1 → Switch1 → Router1 (Gig0/0)
+
+Router0 Gig0/1 → Router1 Gig0/1 (use straight-through cable)
+
+✅ STEP 2: Configure Router0
+
+Click Router0 → CLI → type:
+
+enable
+configure terminal
+interface gigabitEthernet0/0
+ip address 192.168.20.1 255.255.255.0
+no shutdown
+exit
+
+interface gigabitEthernet0/1
+ip address 10.0.0.1 255.255.255.252
+no shutdown
+exit
+
+
+👉 Gig0/0 = for PC network
+👉 Gig0/1 = for router-to-router link
+
+✅ STEP 3: Configure PC0
+
+PC0 → Desktop → IP Configuration
+
+IP Address: 192.168.20.10
+Subnet Mask: 255.255.255.0
+Default Gateway: 192.168.20.1
+
+✅ STEP 4: Configure Router1
+
+Router1 → CLI:
+
+enable
+configure terminal
+interface gigabitEthernet0/0
+ip address 192.168.30.1 255.255.255.0
+no shutdown
+exit
+
+interface gigabitEthernet0/1
+ip address 10.0.0.2 255.255.255.252
+no shutdown
+exit
+
+✅ STEP 5: Configure PC1
+
+PC1 → Desktop → IP Configuration:
+
+IP Address: 192.168.30.10
+Subnet Mask: 255.255.255.0
+Default Gateway: 192.168.30.1
+
+🌟 NOW THE IMPORTANT PART — STATIC ROUTES
+
+Routers know only their own networks.
+You must tell them how to reach each other.
+
+✅ STEP 6: Router0 → Add route to Network B
+enable
+configure terminal
+ip route 192.168.30.0 255.255.255.0 10.0.0.2
+
+
+Meaning:
+
+“To reach network 192.168.30.x go through 10.0.0.2 (Router1).”
+
+✅ STEP 7: Router1 → Add route to Network A
+enable
+configure terminal
+ip route 192.168.20.0 255.255.255.0 10.0.0.1
+
+
+Meaning:
+
+“To reach network 192.168.20.x go through 10.0.0.1 (Router0).”
+
+🌟 STEP 8: Test (Ping)
+
+From PC0, type:
+
+ping 192.168.30.10
+
+
+From PC1, type:
+
+ping 192.168.20.10
+
+
+If both replies → Static Routing Successful!
